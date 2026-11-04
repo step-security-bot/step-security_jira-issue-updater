@@ -7,7 +7,7 @@
 A GitHub action to update properties of an existing Jira issue.
 
 > -   Only supports Jira Cloud.
-> -   Requires [Jira Login Action](https://github.com/marketplace/actions/atlassian-jira-login).
+> -   Requires [Jira Login Action](https://github.com/step-security/gha-jira-login).
 
 ## Usage
 
@@ -353,5 +353,3 @@ with the action's output.
 3. `failed` - A list of IDs of issues that failed to get updated. This may be useful to add comments to the tickets
    in question or to report those tickets to a Slack or MSTeams channel. The format is again the same as
    with the `issues` option.
-
-```
