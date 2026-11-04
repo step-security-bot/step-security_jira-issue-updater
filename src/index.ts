@@ -1,4 +1,4 @@
-import { error, info, setFailed, setOutput } from "@actions/core";
+import { error, info, setFailed, setOutput, setSecret } from "@actions/core";
 import { getInputs, getLoginData } from "./config";
 import { createPayload } from "./payload";
 import { sendRequest } from "./request";
@@ -53,10 +53,23 @@ async function validateSubscription() {
     }
 }
 
+// Serializes only non-sensitive fields: AxiosError.toJSON() includes the request config,
+// which holds the Jira email and API token (config.auth).
+function describeError(err: any): string {
+    return JSON.stringify({
+        name: err?.name,
+        message: err?.message,
+        code: err?.code,
+        status: err?.response?.status,
+        data: err?.response?.data,
+    });
+}
+
 async function run() {
     await validateSubscription();
 
     const login = getLoginData();
+    setSecret(login.token);
     const inputs = getInputs();
     const payload = createPayload(inputs);
 
@@ -77,7 +90,7 @@ async function run() {
                         failed.push(issue);
                         info(`Update of Jira issue ${issue} failed`);
                     }
-                    error(JSON.stringify(err));
+                    error(describeError(err));
                 })
         );
     }
@@ -91,5 +104,5 @@ async function run() {
 
 run().catch((err: any) => {
     setFailed("An unexpected exception has occurred. Check debug output for more info");
-    error(err);
+    error(describeError(err));
 });
